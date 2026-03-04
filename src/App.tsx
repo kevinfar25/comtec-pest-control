@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { motion } from 'motion/react';
+import { motion, AnimatePresence } from 'motion/react';
 import {
   Facebook,
   Instagram,
@@ -19,10 +19,20 @@ import {
   Star,
   CalendarCheck,
   CheckCircle2,
+  ChevronDown,
+  Building2,
+  Zap,
+  Award,
+  MapPin,
+  Leaf,
+  Briefcase,
+  Warehouse,
+  Key,
+  Utensils,
 } from 'lucide-react';
 import Chatbot from './Chatbot';
 
-type Page = 'home' | 'book' | 'contact';
+type Page = 'home' | 'book' | 'contact' | 'commercial';
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -38,9 +48,10 @@ export default function App() {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [activePage, setActivePage] = useState<Page>('home');
   const [bookingSuccess, setBookingSuccess] = useState(false);
-  const [bookingForm, setBookingForm] = useState({ name: '', phone: '', pestType: '', address: '' });
+  const [bookingForm, setBookingForm] = useState({ name: '', phone: '', pestType: '', address: '', plan: '' });
   const [contactSuccess, setContactSuccess] = useState(false);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+  const [activeFaq, setActiveFaq] = useState<number | null>(null);
 
   const navigate = (page: Page) => {
     setActivePage(page);
@@ -51,7 +62,7 @@ export default function App() {
   const handleBookingSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     setBookingSuccess(true);
-    setBookingForm({ name: '', phone: '', pestType: '', address: '' });
+    setBookingForm({ name: '', phone: '', pestType: '', address: '', plan: '' });
   };
 
   const handleContactSubmit = (e: React.FormEvent) => {
@@ -63,37 +74,37 @@ export default function App() {
   const services = [
     {
       icon: Bug,
-      name: 'Cockroach Control',
-      desc: 'Cockroaches breed fast and hide deeper than you think. We eliminate the colony — not just the ones you can see.',
+      name: 'Stop Cockroaches Before They Multiply',
+      desc: "Cockroaches breed fast and hide deeper than you think. We eliminate the colony — not just the ones you can see.",
       img: 'https://images.pexels.com/photos/6526933/pexels-photo-6526933.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
     {
       icon: BugOff,
-      name: 'Ant Control',
+      name: 'Ants in Your Kitchen? Not for Long.',
       desc: 'Ant trails in your kitchen mean a colony is nearby. We destroy it at the source before they spread to every room.',
       img: 'https://images.pexels.com/photos/14255746/pexels-photo-14255746.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
     {
       icon: Mouse,
-      name: 'Rodent Control',
+      name: 'Rodents Carry Disease — We Remove Them.',
       desc: 'Rodents chew wiring, contaminate food, and carry disease. We remove them, seal the entry points, and protect your home permanently.',
       img: 'https://images.pexels.com/photos/7164046/pexels-photo-7164046.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
     {
       icon: Wind,
-      name: 'Fly & Mosquito Control',
-      desc: 'Flies on your food. Mosquitoes keeping you up at night. We eliminate breeding sites and create a barrier so you can use your home in peace.',
+      name: 'Enjoy Your Terrace Again.',
+      desc: 'Flies on your food. Mosquitoes keeping you up at night. We eliminate breeding sites and create a barrier so you can live in peace.',
       img: 'https://images.pexels.com/photos/12719589/pexels-photo-12719589.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
     {
       icon: Bird,
-      name: 'Bird Control',
+      name: 'Bird Proofing That Actually Works.',
       desc: 'Birds nesting on your property mean damage, mess, and noise. We install humane deterrents that actually work — and keep working.',
       img: 'https://images.pexels.com/photos/12828418/pexels-photo-12828418.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
     {
       icon: TreePine,
-      name: 'WoodWorm & Termite Control',
+      name: 'Termites Destroy Silently. We Stop Them.',
       desc: "Termites silently eat through your home's structure before you notice. We detect them early, eliminate them completely, and protect your investment.",
       img: 'https://images.pexels.com/photos/12895278/pexels-photo-12895278.jpeg?auto=compress&cs=tinysrgb&h=350',
     },
@@ -106,12 +117,21 @@ export default function App() {
     { value: '100%', label: 'Guaranteed Results' },
   ];
 
+  const trustBadges = [
+    { icon: Award, label: 'Est. 1999 — 25+ Years' },
+    { icon: ShieldCheck, label: 'Fully Licensed & Insured' },
+    { icon: Leaf, label: 'EU-Approved, Family-Safe Products' },
+    { icon: MapPin, label: 'All Malta & Gozo' },
+    { icon: Star, label: '5★ Google Rated' },
+    { icon: CheckCircle2, label: 'Pest-Free Guarantee' },
+  ];
+
   const steps = [
     {
       icon: Phone,
       step: '01',
       title: 'Call or Book Online',
-      desc: 'Contact us in seconds. Same-day and next-day slots available across Malta and Gozo — because pests don\'t wait.',
+      desc: "Contact us in seconds. Same-day and next-day slots available across Malta and Gozo — because pests don't wait.",
     },
     {
       icon: CalendarCheck,
@@ -123,7 +143,7 @@ export default function App() {
       icon: CheckCircle2,
       step: '03',
       title: 'Problem Solved. Guaranteed.',
-      desc: 'Your home is protected. If the pest returns, we come back at no extra cost until it\'s completely resolved.',
+      desc: "Your home is protected. If the pest returns, we come back at no extra cost until it's completely resolved.",
     },
   ];
 
@@ -166,6 +186,111 @@ export default function App() {
     },
   ];
 
+  const commercialSectors = [
+    {
+      icon: Utensils,
+      name: 'Restaurants & Bars',
+      desc: 'Protect your hygiene rating. A single pest sighting can cost you your licence. We keep your kitchen compliant and pest-free year-round.',
+    },
+    {
+      icon: Building2,
+      name: 'Hotels & Guesthouses',
+      desc: 'One bad review can follow you for months. Our discreet, reliable service protects your TripAdvisor rating and your guests.',
+    },
+    {
+      icon: Briefcase,
+      name: 'Offices & Commercial',
+      desc: 'A pest-free workplace protects your staff, your reputation, and your productivity. We work around your schedule.',
+    },
+    {
+      icon: Warehouse,
+      name: 'Warehouses & Food Retail',
+      desc: 'Protect stock, meet food safety regulations, and stay fully compliant with Maltese and EU standards.',
+    },
+    {
+      icon: Key,
+      name: 'Property Management',
+      desc: 'One trusted partner for all your managed properties — consolidated reporting, priority response, and competitive rates.',
+    },
+    {
+      icon: TreePine,
+      name: 'Construction & Sites',
+      desc: 'Rodent and pest control for active building sites to protect workers, materials, and prevent structural damage.',
+    },
+  ];
+
+  const plans = [
+    {
+      name: 'One-Off Treatment',
+      tagline: 'Fast relief for an active infestation',
+      features: [
+        'Single targeted treatment',
+        'Certified technician visit',
+        'Post-treatment guidance',
+        'Covered by our guarantee',
+      ],
+      popular: false,
+      cta: 'Get a Quote',
+    },
+    {
+      name: 'Seasonal Protection',
+      tagline: "Covers Malta's peak pest season: April–October",
+      features: [
+        'Quarterly inspections & treatments',
+        'Covers all common pests',
+        'Priority booking guaranteed',
+        'Free follow-up if needed',
+        'Better value than one-off visits',
+      ],
+      popular: true,
+      cta: 'Get a Quote',
+    },
+    {
+      name: 'Annual Contract',
+      tagline: 'Year-round peace of mind for home or business',
+      features: [
+        'Scheduled visits all year',
+        'Free call-outs between treatments',
+        'Residential & commercial',
+        'Detailed treatment reports',
+        'Best value per treatment',
+      ],
+      popular: false,
+      cta: 'Get a Quote',
+    },
+  ];
+
+  const faqs = [
+    {
+      q: 'Are your treatments safe for children and pets?',
+      a: "Yes. We use professional-grade, EU-approved products applied by certified technicians. We'll always advise you on any precautions needed — such as vacating the property for a short period — before we begin.",
+    },
+    {
+      q: 'How quickly can you attend? Do you offer same-day appointments?',
+      a: "We aim to respond the same day for urgent problems. Same-day and next-day appointments are available across Malta and Gozo. Call us on 21800666 or 79800666 and we'll get a technician to you as fast as possible.",
+    },
+    {
+      q: 'How many treatments will I need?',
+      a: "Most infestations are resolved in 1–2 treatments. Some cases — such as heavy rodent infestations or termite problems — may require a multi-visit plan. We'll always be upfront about what's needed after the initial inspection.",
+    },
+    {
+      q: 'Do you treat both residential homes and commercial premises?',
+      a: "Absolutely. We serve homeowners, landlords, and commercial clients — restaurants, hotels, offices, warehouses, food retailers, and more. We offer tailored maintenance contracts for businesses.",
+    },
+    {
+      q: 'Are your products EU-approved and environmentally responsible?',
+      a: "Yes. All products are fully EU-approved and legally compliant. We use targeted treatments to minimise environmental impact and offer eco-conscious options where suitable.",
+    },
+    {
+      q: "Why do cockroaches keep coming back in Malta?",
+      a: "Malta's warm, humid Mediterranean climate — especially between May and October — is ideal for cockroach breeding. Shop sprays kill what you can see but don't reach the colony in walls, drains, and crevices. Our treatment eliminates the entire colony at the source.",
+    },
+    {
+      q: 'How much does pest control cost in Malta?',
+      a: "Pricing depends on pest type, severity, and property size. We offer free, no-obligation quotes tailored to your situation. Call us on 21800666 or book online to get started — there's no commitment.",
+    },
+  ];
+
   const navLinkClass = (page: Page) =>
     `text-sm font-medium transition-colors ${
       activePage === page
@@ -187,7 +312,10 @@ export default function App() {
       {/* Top Bar */}
       <div className="bg-emerald-800 text-white text-xs py-2 px-4">
         <div className="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-2">
-          <p className="font-medium tracking-wide">We have got you covered!</p>
+          <div className="flex items-center gap-1.5">
+            <Zap className="w-3 h-3 shrink-0" />
+            <p className="font-medium tracking-wide">Same-day pest control across Malta &amp; Gozo</p>
+          </div>
           <div className="flex items-center gap-6">
             <div className="flex items-center gap-4">
               <a href="tel:+35621800666" className="hover:text-emerald-200 transition-colors flex items-center gap-1.5">
@@ -218,15 +346,23 @@ export default function App() {
               />
             </button>
 
-            <nav className="hidden md:flex items-center gap-8">
+            <nav className="hidden md:flex items-center gap-6">
               <button onClick={() => navigate('home')} className={navLinkClass('home')}>Home</button>
+              <button onClick={() => navigate('commercial')} className={navLinkClass('commercial')}>Commercial</button>
               <button onClick={() => navigate('book')} className={navLinkClass('book')}>Book Online</button>
               <button onClick={() => navigate('contact')} className={navLinkClass('contact')}>Contact</button>
+              <a
+                href="tel:+35621800666"
+                className="flex items-center gap-1.5 text-sm font-semibold text-neutral-700 hover:text-emerald-600 transition-colors border-l border-neutral-200 pl-6"
+              >
+                <Phone className="w-4 h-4" />
+                21800666
+              </a>
               <button
                 onClick={() => navigate('book')}
                 className="bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold px-5 py-2.5 rounded-lg transition-all hover:scale-105 active:scale-95"
               >
-                Get a Quote
+                Get a Free Quote
               </button>
             </nav>
 
@@ -244,14 +380,22 @@ export default function App() {
           <div className="md:hidden border-t border-neutral-200 bg-white absolute w-full left-0 shadow-lg z-50">
             <nav className="flex flex-col">
               <button onClick={() => navigate('home')} className={mobileNavClass('home')}>Home</button>
+              <button onClick={() => navigate('commercial')} className={mobileNavClass('commercial')}>Commercial</button>
               <button onClick={() => navigate('book')} className={mobileNavClass('book')}>Book Online</button>
               <button onClick={() => navigate('contact')} className={`${mobileNavClass('contact')} border-b-0`}>Contact</button>
-              <div className="p-4">
+              <div className="p-4 space-y-3">
+                <a
+                  href="tel:+35621800666"
+                  className="flex items-center justify-center gap-2 w-full border border-emerald-600 text-emerald-600 font-semibold py-3 rounded-lg min-h-12"
+                >
+                  <Phone className="w-4 h-4" />
+                  Call 21800666
+                </a>
                 <button
                   onClick={() => navigate('book')}
-                  className="w-full bg-emerald-600 text-white font-semibold py-3.5 rounded-lg"
+                  className="w-full bg-emerald-600 text-white font-semibold py-3.5 rounded-lg min-h-12"
                 >
-                  Get a Quote
+                  Get a Free Quote
                 </button>
               </div>
             </nav>
@@ -303,7 +447,7 @@ export default function App() {
                     onClick={() => navigate('book')}
                     className="bg-white text-emerald-900 font-bold px-8 py-4 rounded-lg text-lg hover:bg-emerald-50 transition-all hover:shadow-xl hover:scale-105 active:scale-95 min-h-14"
                   >
-                    Book a Service
+                    Get a Free Quote
                   </button>
                   <a
                     href="tel:+35621800666"
@@ -312,6 +456,14 @@ export default function App() {
                     <Phone className="w-5 h-5" />
                     Call 21800666
                   </a>
+                </motion.div>
+                <motion.div
+                  variants={fadeUp}
+                  className="flex flex-wrap items-center justify-center gap-4 md:gap-8 text-sm text-emerald-200 pt-2"
+                >
+                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> No obligation</span>
+                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Same-day available</span>
+                  <span className="flex items-center gap-1.5"><CheckCircle2 className="w-4 h-4" /> Pest-free guaranteed</span>
                 </motion.div>
               </motion.div>
             </div>
@@ -333,6 +485,18 @@ export default function App() {
                 </motion.div>
               ))}
             </motion.div>
+          </div>
+
+          {/* Trust Badges */}
+          <div className="bg-white border-b border-neutral-100 py-4 px-4 overflow-x-auto">
+            <div className="max-w-5xl mx-auto flex flex-nowrap md:flex-wrap justify-start md:justify-center gap-x-8 gap-y-3 min-w-max md:min-w-0">
+              {trustBadges.map(({ icon: Icon, label }) => (
+                <div key={label} className="flex items-center gap-2 text-sm text-neutral-600 whitespace-nowrap">
+                  <Icon className="w-4 h-4 text-emerald-600 shrink-0" />
+                  <span>{label}</span>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Services Grid */}
@@ -378,7 +542,7 @@ export default function App() {
                       <div className="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center mb-3 transition-colors group-hover:bg-emerald-200">
                         <Icon className="w-5 h-5 text-emerald-600" />
                       </div>
-                      <h3 className="font-bold text-neutral-800 mb-1.5">{name}</h3>
+                      <h3 className="font-bold text-neutral-800 mb-1.5 text-sm leading-snug">{name}</h3>
                       <p className="text-sm text-neutral-500 leading-relaxed">{desc}</p>
                     </div>
                   </motion.div>
@@ -480,6 +644,67 @@ export default function App() {
             </div>
           </section>
 
+          {/* Commercial Section */}
+          <section className="py-20 px-4 bg-neutral-900 text-white">
+            <div className="max-w-7xl mx-auto">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="text-center mb-14"
+              >
+                <motion.span
+                  variants={fadeUp}
+                  className="inline-block bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full mb-4"
+                >
+                  Commercial Services
+                </motion.span>
+                <motion.h2 variants={fadeUp} className="text-3xl font-bold mb-4">
+                  Protecting Malta's Businesses Since 1999
+                </motion.h2>
+                <motion.p variants={fadeUp} className="text-neutral-400 max-w-2xl mx-auto">
+                  A single pest sighting can cost a restaurant its hygiene rating, a hotel its TripAdvisor score, and a business its reputation. We provide discreet, reliable contract pest management for Malta's commercial sector.
+                </motion.p>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="grid grid-cols-2 md:grid-cols-3 gap-5 mb-12"
+              >
+                {commercialSectors.map(({ icon: Icon, name, desc }) => (
+                  <motion.div
+                    key={name}
+                    variants={fadeUp}
+                    className="bg-neutral-800 border border-neutral-700 rounded-xl p-6 hover:border-emerald-600/50 transition-colors"
+                  >
+                    <div className="w-10 h-10 bg-emerald-900/60 rounded-lg flex items-center justify-center mb-4">
+                      <Icon className="w-5 h-5 text-emerald-400" />
+                    </div>
+                    <h3 className="font-bold text-white mb-2 text-sm">{name}</h3>
+                    <p className="text-neutral-400 text-sm leading-relaxed">{desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="text-center"
+              >
+                <button
+                  onClick={() => navigate('commercial')}
+                  className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all hover:scale-105 active:scale-95 min-h-14"
+                >
+                  Learn About Commercial Services
+                </button>
+              </motion.div>
+            </div>
+          </section>
+
           {/* Testimonials */}
           <section className="py-20 px-4 bg-neutral-50">
             <div className="max-w-6xl mx-auto">
@@ -493,9 +718,21 @@ export default function App() {
                 <motion.h2 variants={fadeUp} className="text-3xl font-bold text-neutral-800 mb-3">
                   What Malta Says About Us
                 </motion.h2>
-                <motion.p variants={fadeUp} className="text-neutral-500">
-                  Real customers. Real results.
+                <motion.p variants={fadeUp} className="text-neutral-500 mb-3">
+                  Real customers. Real results. Verified on Google.
                 </motion.p>
+                <motion.a
+                  variants={fadeUp}
+                  href="#"
+                  className="inline-flex items-center gap-2 text-sm font-semibold text-emerald-600 hover:text-emerald-700 transition-colors"
+                >
+                  <div className="flex gap-0.5">
+                    {Array.from({ length: 5 }).map((_, i) => (
+                      <Star key={i} className="w-4 h-4 fill-amber-400 text-amber-400" />
+                    ))}
+                  </div>
+                  View our Google reviews →
+                </motion.a>
               </motion.div>
               <motion.div
                 initial="hidden"
@@ -531,6 +768,145 @@ export default function App() {
             </div>
           </section>
 
+          {/* Service Plans */}
+          <section className="py-20 px-4 bg-white">
+            <div className="max-w-5xl mx-auto">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="text-center mb-12"
+              >
+                <motion.h2 variants={fadeUp} className="text-3xl font-bold text-neutral-800 mb-3">
+                  Choose Your Level of Protection
+                </motion.h2>
+                <motion.p variants={fadeUp} className="text-neutral-500 max-w-xl mx-auto">
+                  From a single urgent treatment to year-round protection — we have a plan to suit every home and business.
+                </motion.p>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="grid grid-cols-1 md:grid-cols-3 gap-6"
+              >
+                {plans.map(({ name, tagline, features, popular, cta }) => (
+                  <motion.div
+                    key={name}
+                    variants={fadeUp}
+                    className={`relative rounded-2xl p-7 border flex flex-col gap-5 ${
+                      popular
+                        ? 'bg-emerald-700 border-emerald-600 text-white shadow-xl scale-[1.03]'
+                        : 'bg-neutral-50 border-neutral-200 text-neutral-800'
+                    }`}
+                  >
+                    {popular && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-amber-400 text-amber-900 text-xs font-bold px-4 py-1 rounded-full uppercase tracking-wide whitespace-nowrap">
+                        Most Popular
+                      </span>
+                    )}
+                    <div>
+                      <h3 className={`text-xl font-bold mb-1 ${popular ? 'text-white' : 'text-neutral-800'}`}>{name}</h3>
+                      <p className={`text-sm ${popular ? 'text-emerald-200' : 'text-neutral-500'}`}>{tagline}</p>
+                    </div>
+                    <ul className="space-y-2.5 flex-1">
+                      {features.map(f => (
+                        <li key={f} className={`flex items-start gap-2.5 text-sm ${popular ? 'text-emerald-100' : 'text-neutral-600'}`}>
+                          <CheckCircle2 className={`w-4 h-4 mt-0.5 shrink-0 ${popular ? 'text-emerald-300' : 'text-emerald-500'}`} />
+                          {f}
+                        </li>
+                      ))}
+                    </ul>
+                    <button
+                      onClick={() => navigate('book')}
+                      className={`w-full font-bold py-3 rounded-lg transition-all min-h-12 ${
+                        popular
+                          ? 'bg-white text-emerald-800 hover:bg-emerald-50'
+                          : 'bg-emerald-600 hover:bg-emerald-700 text-white'
+                      }`}
+                    >
+                      {cta}
+                    </button>
+                  </motion.div>
+                ))}
+              </motion.div>
+              <motion.p
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="text-center text-sm text-neutral-400 mt-8"
+              >
+                All plans include our guarantee — if pests return, so do we. Free of charge.
+              </motion.p>
+            </div>
+          </section>
+
+          {/* FAQ */}
+          <section className="py-20 px-4 bg-neutral-50">
+            <div className="max-w-3xl mx-auto">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="text-center mb-12"
+              >
+                <motion.h2 variants={fadeUp} className="text-3xl font-bold text-neutral-800 mb-3">
+                  Frequently Asked Questions
+                </motion.h2>
+                <motion.p variants={fadeUp} className="text-neutral-500">
+                  Everything you need to know before booking.
+                </motion.p>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="space-y-3"
+              >
+                {faqs.map(({ q, a }, i) => (
+                  <motion.div
+                    key={i}
+                    variants={fadeUp}
+                    className="bg-white border border-neutral-200 rounded-xl overflow-hidden"
+                  >
+                    <button
+                      onClick={() => setActiveFaq(activeFaq === i ? null : i)}
+                      className="w-full flex items-center justify-between gap-4 px-6 py-5 text-left font-semibold text-neutral-800 hover:text-emerald-700 transition-colors min-h-14"
+                    >
+                      <span className="text-sm">{q}</span>
+                      <motion.div
+                        animate={{ rotate: activeFaq === i ? 180 : 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="shrink-0"
+                      >
+                        <ChevronDown className="w-5 h-5 text-emerald-600" />
+                      </motion.div>
+                    </button>
+                    <AnimatePresence initial={false}>
+                      {activeFaq === i && (
+                        <motion.div
+                          key="content"
+                          initial={{ height: 0, opacity: 0 }}
+                          animate={{ height: 'auto', opacity: 1 }}
+                          exit={{ height: 0, opacity: 0 }}
+                          transition={{ duration: 0.25, ease: 'easeInOut' }}
+                          className="overflow-hidden"
+                        >
+                          <p className="px-6 pb-5 text-sm text-neutral-500 leading-relaxed border-t border-neutral-100 pt-4">{a}</p>
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+
           {/* Bottom CTA Banner */}
           <section className="bg-emerald-700 text-white py-16 px-4">
             <motion.div
@@ -549,7 +925,184 @@ export default function App() {
                   onClick={() => navigate('book')}
                   className="bg-white text-emerald-800 font-bold px-8 py-4 rounded-lg text-lg hover:bg-emerald-50 transition-all hover:shadow-xl hover:scale-105 active:scale-95 min-h-14"
                 >
-                  Book Online
+                  Get a Free Quote
+                </button>
+                <a
+                  href="tel:+35621800666"
+                  className="border-2 border-white/70 text-white font-bold px-8 py-4 rounded-lg text-lg hover:bg-white/10 hover:border-white transition-all flex items-center justify-center gap-2 min-h-14"
+                >
+                  <Phone className="w-5 h-5" />
+                  Call Now
+                </a>
+              </motion.div>
+              <motion.p variants={fadeUp} className="text-emerald-200 text-sm">
+                Free quote · No obligation · Pest-free guaranteed
+              </motion.p>
+            </motion.div>
+          </section>
+
+        </main>
+      )}
+
+      {/* ── PAGE: COMMERCIAL ── */}
+      {activePage === 'commercial' && (
+        <main>
+
+          {/* Commercial Hero */}
+          <section className="bg-neutral-900 text-white py-24 px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <motion.div
+                initial="hidden"
+                animate="visible"
+                variants={stagger}
+                className="flex flex-col items-center gap-6"
+              >
+                <motion.span
+                  variants={fadeUp}
+                  className="inline-block bg-emerald-600/20 border border-emerald-500/30 text-emerald-400 text-xs font-semibold uppercase tracking-widest px-4 py-1.5 rounded-full"
+                >
+                  Commercial Pest Control
+                </motion.span>
+                <motion.h1 variants={fadeUp} className="text-4xl md:text-5xl font-bold leading-tight">
+                  Protect Your Business.<br />Protect Your Reputation.
+                </motion.h1>
+                <motion.p variants={fadeUp} className="text-xl text-neutral-300 max-w-2xl">
+                  A single pest sighting can cost a restaurant its hygiene rating, a hotel its TripAdvisor score, and a business its customers. Comtec provides discreet, reliable contract pest management for Malta's commercial sector.
+                </motion.p>
+                <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
+                  <button
+                    onClick={() => navigate('book')}
+                    className="bg-emerald-600 hover:bg-emerald-500 text-white font-bold px-8 py-4 rounded-lg text-lg transition-all hover:scale-105 active:scale-95 min-h-14"
+                  >
+                    Get a Commercial Quote
+                  </button>
+                  <a
+                    href="tel:+35621800666"
+                    className="border-2 border-white/40 text-white font-bold px-8 py-4 rounded-lg text-lg hover:bg-white/10 transition-all flex items-center justify-center gap-2 min-h-14"
+                  >
+                    <Phone className="w-5 h-5" />
+                    Call 21800666
+                  </a>
+                </motion.div>
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Commercial Sectors */}
+          <section className="py-20 px-4 bg-white">
+            <div className="max-w-7xl mx-auto">
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="text-center mb-12"
+              >
+                <motion.h2 variants={fadeUp} className="text-3xl font-bold text-neutral-800 mb-3">
+                  Industries We Serve
+                </motion.h2>
+                <motion.p variants={fadeUp} className="text-neutral-500 max-w-xl mx-auto">
+                  Tailored pest management for every commercial sector across Malta and Gozo.
+                </motion.p>
+              </motion.div>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
+              >
+                {commercialSectors.map(({ icon: Icon, name, desc }) => (
+                  <motion.div
+                    key={name}
+                    variants={fadeUp}
+                    className="bg-neutral-50 border border-neutral-200 rounded-xl p-7 hover:border-emerald-300 hover:shadow-sm transition-all"
+                  >
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center mb-5">
+                      <Icon className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <h3 className="font-bold text-neutral-800 mb-2">{name}</h3>
+                    <p className="text-sm text-neutral-500 leading-relaxed">{desc}</p>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Why Commercial Choose Comtec */}
+          <section className="py-20 px-4 bg-neutral-50">
+            <div className="max-w-5xl mx-auto">
+              <motion.h2
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true }}
+                variants={fadeUp}
+                className="text-3xl font-bold text-neutral-800 text-center mb-12"
+              >
+                What Our Commercial Contracts Include
+              </motion.h2>
+              <motion.div
+                initial="hidden"
+                whileInView="visible"
+                viewport={{ once: true, margin: '-60px' }}
+                variants={stagger}
+                className="grid grid-cols-1 md:grid-cols-2 gap-8"
+              >
+                {[
+                  {
+                    icon: ShieldCheck,
+                    title: 'Compliance-Ready Documentation',
+                    desc: 'Full written treatment reports and pest monitoring logs to support hygiene audits, health inspections, and regulatory compliance.',
+                  },
+                  {
+                    icon: Clock,
+                    title: 'Priority Response',
+                    desc: 'Commercial contract clients receive priority scheduling. We understand that a pest emergency at a food business cannot wait.',
+                  },
+                  {
+                    icon: Leaf,
+                    title: 'Discreet, Minimally Disruptive Service',
+                    desc: "We work around your operations — early mornings, evenings, or outside business hours. Your customers won't know we were there.",
+                  },
+                  {
+                    icon: Trophy,
+                    title: 'Dedicated Account Management',
+                    desc: 'One point of contact, consistent technicians who know your site, and a tailored treatment programme reviewed annually.',
+                  },
+                ].map(({ icon: Icon, title, desc }) => (
+                  <motion.div key={title} variants={fadeUp} className="flex items-start gap-5">
+                    <div className="w-12 h-12 bg-emerald-100 rounded-xl flex items-center justify-center shrink-0">
+                      <Icon className="w-6 h-6 text-emerald-600" />
+                    </div>
+                    <div>
+                      <h3 className="font-bold text-neutral-800 mb-1.5">{title}</h3>
+                      <p className="text-neutral-500 text-sm leading-relaxed">{desc}</p>
+                    </div>
+                  </motion.div>
+                ))}
+              </motion.div>
+            </div>
+          </section>
+
+          {/* Commercial CTA */}
+          <section className="bg-emerald-700 text-white py-16 px-4">
+            <motion.div
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true }}
+              variants={stagger}
+              className="flex flex-col items-center gap-6 text-center max-w-2xl mx-auto"
+            >
+              <motion.h2 variants={fadeUp} className="text-3xl font-bold">Ready to protect your business?</motion.h2>
+              <motion.p variants={fadeUp} className="text-emerald-100 text-lg">
+                Get in touch for a free, no-obligation commercial assessment. We'll recommend the right contract for your premises.
+              </motion.p>
+              <motion.div variants={fadeUp} className="flex flex-col sm:flex-row gap-4">
+                <button
+                  onClick={() => navigate('book')}
+                  className="bg-white text-emerald-800 font-bold px-8 py-4 rounded-lg text-lg hover:bg-emerald-50 transition-all hover:scale-105 active:scale-95 min-h-14"
+                >
+                  Get a Commercial Quote
                 </button>
                 <a
                   href="tel:+35621800666"
@@ -570,8 +1123,9 @@ export default function App() {
         <main className="py-16 px-4">
           <div className="max-w-lg mx-auto">
             <div className="bg-white rounded-2xl shadow-sm border border-neutral-200 p-8">
-              <h1 className="text-3xl font-bold text-neutral-800 mb-2">Book a Service</h1>
-              <p className="text-neutral-500 mb-8">Tell us what's going on. We'll take it from there.</p>
+              <h1 className="text-3xl font-bold text-neutral-800 mb-2">Get a Free Quote</h1>
+              <p className="text-neutral-500 mb-2">Tell us what's going on. We'll take it from there.</p>
+              <p className="text-xs text-neutral-400 mb-8">No obligation · We respond within 24 hours · Pest-free guaranteed</p>
 
               {bookingSuccess ? (
                 <motion.div
@@ -582,7 +1136,7 @@ export default function App() {
                   <div className="w-14 h-14 bg-emerald-100 rounded-full flex items-center justify-center mx-auto mb-4">
                     <CheckCircle2 className="w-7 h-7 text-emerald-600" />
                   </div>
-                  <p className="text-emerald-800 font-bold text-lg mb-1">Booking Request Received!</p>
+                  <p className="text-emerald-800 font-bold text-lg mb-1">Request Received!</p>
                   <p className="text-emerald-600 text-sm">We'll be in touch shortly to confirm your appointment.</p>
                 </motion.div>
               ) : (
@@ -621,10 +1175,24 @@ export default function App() {
                       <option>Cockroaches</option>
                       <option>Ants</option>
                       <option>Rodents</option>
-                      <option>Flies & Mosquitoes</option>
+                      <option>Flies &amp; Mosquitoes</option>
                       <option>Birds</option>
-                      <option>WoodWorm & Termites</option>
+                      <option>WoodWorm &amp; Termites</option>
                       <option>Other</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-neutral-700 mb-1.5">Service Type</label>
+                    <select
+                      value={bookingForm.plan}
+                      onChange={e => setBookingForm(f => ({ ...f, plan: e.target.value }))}
+                      className={`${inputClass} bg-white`}
+                    >
+                      <option value="">Not sure yet — I'd like advice</option>
+                      <option>One-Off Treatment</option>
+                      <option>Seasonal Protection Plan</option>
+                      <option>Annual Contract</option>
+                      <option>Commercial Contract</option>
                     </select>
                   </div>
                   <div>
@@ -643,7 +1211,7 @@ export default function App() {
                     type="submit"
                     className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-bold py-4 rounded-lg transition-all hover:shadow-md text-base min-h-14"
                   >
-                    Request a Booking
+                    Request a Free Quote
                   </button>
                   <p className="text-xs text-center text-neutral-400">
                     Or call us directly:{' '}
@@ -794,7 +1362,7 @@ export default function App() {
                 />
               </div>
               <p className="text-sm text-neutral-400 mb-4 max-w-xs">
-                Professional pest control services across Malta and Gozo. We have got you covered!
+                Professional pest control for homes and businesses across Malta and Gozo. Est. 1999.
               </p>
               <div className="flex items-center gap-4">
                 <a href="#" className="w-10 h-10 rounded-full bg-neutral-800 flex items-center justify-center hover:bg-emerald-600 hover:text-white transition-colors">
@@ -834,6 +1402,7 @@ export default function App() {
               <h4 className="text-white font-bold mb-4 uppercase tracking-wider text-sm">Quick Links</h4>
               <ul className="space-y-2 text-sm">
                 <li><button onClick={() => navigate('home')} className="hover:text-emerald-400 transition-colors">Home</button></li>
+                <li><button onClick={() => navigate('commercial')} className="hover:text-emerald-400 transition-colors">Commercial Services</button></li>
                 <li><button onClick={() => navigate('book')} className="hover:text-emerald-400 transition-colors">Book Online</button></li>
                 <li><button onClick={() => navigate('contact')} className="hover:text-emerald-400 transition-colors">Contact</button></li>
               </ul>
